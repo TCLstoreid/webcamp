@@ -9,6 +9,7 @@ Hanya Menampilkan ijin dan Mengambil gambar/vidio
 Clone repo:
 
 `git clone https://github.com/TCLstoreid/webcamp.git`
+
 `cd webcamp`
 
 `Install Node.js & npm`
